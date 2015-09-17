@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="7706" systemVersion="14F27" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="X1Z-Zy-RUd">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="7703"/>
+        <capability name="Constraints to layout margins" minToolsVersion="6.0"/>
+    </dependencies>
+    <scenes>
+        <!--Player View Controller-->
+        <scene sceneID="5Gd-N6-Z9w">
+            <objects>
+                <viewController storyboardIdentifier="PlayerViewController" useStoryboardIdentifierAsRestorationIdentifier="YES" id="Rhc-nq-5pi" customClass="PlayerViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="gPR-Az-bCI"/>
+                        <viewControllerLayoutGuide type="bottom" id="KvC-Wj-GZe"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="0Uw-ht-mMN">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="zVg-bt-pEt" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1468" y="-338"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="mNy-aL-jIh">
+            <objects>
+                <navigationController id="X1Z-Zy-RUd" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="5Ma-1m-3ud">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="agc-hK-MAJ" kind="relationship" relationship="rootViewController" id="5oS-GW-LiX"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Ea0-dw-GRC" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1257" y="241"/>
+        </scene>
+        <!--Base Web View Controller-->
+        <scene sceneID="W2n-QQ-pOQ">
+            <objects>
+                <viewController id="agc-hK-MAJ" customClass="BaseWebViewController" sceneMemberID="viewController">
+                    <layoutGuides>
+                        <viewControllerLayoutGuide type="top" id="phN-In-XCH"/>
+                        <viewControllerLayoutGuide type="bottom" id="ZAe-0g-S2F"/>
+                    </layoutGuides>
+                    <view key="view" contentMode="scaleToFill" id="esU-6C-ThM">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <webView contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="rOu-eK-tLV">
+                                <rect key="frame" x="0.0" y="0.0" width="600" height="556"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <connections>
+                                    <outlet property="delegate" destination="agc-hK-MAJ" id="3WS-GD-se7"/>
+                                </connections>
+                            </webView>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="SUG-6X-5KQ">
+                                <rect key="frame" x="0.0" y="556" width="600" height="44"/>
+                                <subviews>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="wSP-gX-HHV">
+                                        <rect key="frame" x="18" y="8" width="35" height="30"/>
+                                        <state key="normal" title="Back">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onBackButtonClicked:" destination="agc-hK-MAJ" eventType="touchUpInside" id="JfD-nd-vKs"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="4iQ-eR-MxG">
+                                        <rect key="frame" x="285" y="8" width="41" height="30"/>
+                                        <state key="normal" title="Home">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onHomeButtonClicked:" destination="agc-hK-MAJ" eventType="touchUpInside" id="gSA-K8-O68"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="YtP-eG-a11">
+                                        <rect key="frame" x="68" y="8" width="57" height="30"/>
+                                        <state key="normal" title="Forward">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onForwardButtonClicked:" destination="agc-hK-MAJ" eventType="touchUpInside" id="mhp-6P-FAl"/>
+                                        </connections>
+                                    </button>
+                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="NsE-xK-NTc">
+                                        <rect key="frame" x="159" y="7" width="53" height="30"/>
+                                        <state key="normal" title="Refresh">
+                                            <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
+                                        </state>
+                                        <connections>
+                                            <action selector="onHomeButtonClicked:" destination="agc-hK-MAJ" eventType="touchUpInside" id="WPK-PT-Ltx"/>
+                                            <action selector="onRefreshButtonClicked:" destination="agc-hK-MAJ" eventType="touchUpInside" id="IAO-5K-XjV"/>
+                                        </connections>
+                                    </button>
+                                </subviews>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="44" id="3ge-HE-tzc"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <constraints>
+                            <constraint firstItem="SUG-6X-5KQ" firstAttribute="leading" secondItem="esU-6C-ThM" secondAttribute="leading" id="5aJ-Zb-Tlr"/>
+                            <constraint firstItem="rOu-eK-tLV" firstAttribute="top" secondItem="esU-6C-ThM" secondAttribute="topMargin" id="8gx-p6-Uco"/>
+                            <constraint firstItem="rOu-eK-tLV" firstAttribute="top" secondItem="phN-In-XCH" secondAttribute="bottom" id="IAx-Ug-nYM"/>
+                            <constraint firstAttribute="bottom" secondItem="SUG-6X-5KQ" secondAttribute="bottom" id="W1o-Xl-jbB"/>
+                            <constraint firstItem="rOu-eK-tLV" firstAttribute="leading" secondItem="esU-6C-ThM" secondAttribute="leading" id="jsB-2r-Dxq"/>
+                            <constraint firstAttribute="trailing" secondItem="SUG-6X-5KQ" secondAttribute="trailing" id="lhw-Qp-idu"/>
+                            <constraint firstAttribute="bottomMargin" secondItem="rOu-eK-tLV" secondAttribute="bottom" id="sBR-lj-BMf"/>
+                            <constraint firstAttribute="trailing" secondItem="rOu-eK-tLV" secondAttribute="trailing" id="wOf-xw-Wlj"/>
+                            <constraint firstItem="SUG-6X-5KQ" firstAttribute="top" secondItem="rOu-eK-tLV" secondAttribute="bottom" id="wT0-ZG-mEM"/>
+                        </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="IAx-Ug-nYM"/>
+                                <exclude reference="sBR-lj-BMf"/>
+                            </mask>
+                        </variation>
+                    </view>
+                    <navigationItem key="navigationItem" id="hnN-Ak-RcT"/>
+                    <connections>
+                        <outlet property="backButton" destination="wSP-gX-HHV" id="u0l-9H-lrh"/>
+                        <outlet property="forwardButton" destination="YtP-eG-a11" id="HPq-Gr-QaX"/>
+                        <outlet property="homeButton" destination="4iQ-eR-MxG" id="qgU-zL-vCQ"/>
+                        <outlet property="refreshButton" destination="NsE-xK-NTc" id="yJC-cw-FBQ"/>
+                        <outlet property="webView" destination="rOu-eK-tLV" id="rBw-Rk-rOM"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="Zkn-Al-K2l" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="1961" y="241"/>
+        </scene>
+    </scenes>
+</document>
