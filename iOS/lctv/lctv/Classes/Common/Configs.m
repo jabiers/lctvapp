@@ -14,4 +14,24 @@
     return @[@"id_jwplayer", @"noflash-img"];
 }
 
++(BOOL)checkCanGetHeaderInfo:(NSURLRequest *)request {
+    NSString *urlStr = request.URL.absoluteString;
+
+    if ([CAN_GET_HEADER_INFO containsObject:urlStr]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
++(BOOL)checkIfNeedRemoveHeader:(NSURLRequest *)request {
+    NSString *urlStr = request.URL.absoluteString;
+    
+    if ([urlStr isEqualToString:@"https://www.livecoding.tv/"]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
 @end

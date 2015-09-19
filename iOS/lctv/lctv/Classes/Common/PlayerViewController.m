@@ -10,8 +10,10 @@
 
 @implementation PlayerViewController
 
+
 - (void)dealloc
 {
+    self.player = nil;
 }
 
 - (instancetype)initWithURL:(NSURL *)url {
@@ -29,6 +31,10 @@
         // Custom initialization
     }
     return self;
+}
+
++(void)presentFromViewController:(UIViewController *)viewController withTitle:(NSString *)title URL:(NSURL *)url completion:(void (^)())completion {
+    [viewController presentViewController:[[PlayerViewController alloc] initWithURL:url] animated:YES completion:completion];
 }
 
 #define EXPECTED_IJKPLAYER_VERSION (1 << 16) & 0xFF) |
@@ -58,6 +64,12 @@
     
     self.view.autoresizesSubviews = YES;
     [self.view addSubview:self.player.view];
+    
+    UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showOverayPanel)];
+    [self.player.view addGestureRecognizer:tapGesture];
+    
+    [self.view bringSubviewToFront:self.overlayPanel];
+    
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -67,6 +79,8 @@
     
     [self.player prepareToPlay];
     [self.player play];
+    
+    [self performSelector:@selector(hideOverayPanel) withObject:nil afterDelay:5];
     
     NSLog(@"play url : %@", self.url);
 }
@@ -97,6 +111,23 @@
     // Dispose of any resources that can be recreated.
 }
 
+-(void)showOverayPanel {
+    [self.overlayPanel setHidden:NO];
+    
+    [UIView animateWithDuration:0.5 animations:^{
+        [self.overlayPanel setAlpha:1.0f];
+    } completion:^(BOOL finished) {
+        
+    }];
+}
+-(void)hideOverayPanel {
+    [self.overlayPanel setAlpha:1.0f];
+    [UIView animateWithDuration:0.5f animations:^{
+        [self.overlayPanel setAlpha:0.0f];
+    } completion:^(BOOL finished) {
+            [self.overlayPanel setHidden:YES];
+    }];
+}
 #pragma mark IBAction
 
 //- (IBAction)onClickMediaControl:(id)sender
@@ -104,10 +135,10 @@
 //    [self.mediaControl showAndFade];
 //}
 //
-//- (IBAction)onClickOverlay:(id)sender
-//{
-//    [self.mediaControl hide];
-//}
+- (IBAction)onClickOverlay:(id)sender
+{
+    [self performSelector:@selector(hideOverayPanel) withObject:nil];
+}
 
 - (IBAction)onClickBack:(id)sender
 {

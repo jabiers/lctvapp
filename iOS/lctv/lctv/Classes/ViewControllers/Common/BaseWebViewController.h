@@ -17,10 +17,11 @@
 @property (weak, nonatomic) IBOutlet UIButton *homeButton;
 @property (weak, nonatomic) IBOutlet UIButton *refreshButton;
 @property (strong, nonatomic) PlayerViewController *playViewController;
+
+-(void)loadUrl:(NSURL *)url;
 -(void)goHome;
 -(void)refresh;
 -(void)goForward;
 -(void)goBack;
-
 
 @end

@@ -14,6 +14,18 @@
 @property(atomic,strong) NSURL *url;
 @property(atomic, retain) id<IJKMediaPlayback> player;
 
+@property(nonatomic,strong) IBOutlet UIView *overlayPanel;
+@property(nonatomic,strong) IBOutlet UIView *topPanel;
+@property(nonatomic,strong) IBOutlet UIView *bottomPanel;
+
+@property (weak, nonatomic) IBOutlet UIWebView *webView;
+//@property(nonatomic,strong) IBOutlet UIButton *playButton;
+//@property(nonatomic,strong) IBOutlet UIButton *pauseButton;
+//
+//@property(nonatomic,strong) IBOutlet UILabel *currentTimeLabel;
+//@property(nonatomic,strong) IBOutlet UILabel *totalDurationLabel;
+//@property(nonatomic,strong) IBOutlet UISlider *mediaProgressSlider;
+
 - (id)initWithURL:(NSURL *)url;
 
 + (void)presentFromViewController:(UIViewController *)viewController withTitle:(NSString *)title URL:(NSURL *)url completion:(void(^)())completion;

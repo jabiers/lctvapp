@@ -7,9 +7,34 @@
 //
 
 #import "BaseWebViewController.h"
-//#import "PlayerView.h"
+#import "RootViewController.h"
+#import "BaseMenuObject.h"
+
+#import "TFHpple.h"
 
 @implementation BaseWebViewController
+
+-(void)awakeFromNib {
+    NSLog(@"awake ");
+}
+
+-(NSUInteger)supportedInterfaceOrientations {
+    NSLog(@"support ");
+    if ([self isStreamingPlatform]) {
+        return UIInterfaceOrientationMaskPortrait;
+    } else {
+//        return [super supportedInterfaceOrientations];
+    }
+    return UIInterfaceOrientationMaskAllButUpsideDown;
+}
+
+-(void)willRotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation duration:(NSTimeInterval)duration {
+    if (toInterfaceOrientation == UIInterfaceOrientationLandscapeLeft
+        || toInterfaceOrientation == UIInterfaceOrientationLandscapeRight
+        ) {
+//        [self.playViewController setOrientation:toInterfaceOrientation];
+    }
+}
 
 - (void)viewDidLoad {
     [super viewDidLoad];
@@ -23,7 +48,7 @@
     // Dispose of any resources that can be recreated.
 }
 
-#pragma mark - 
+#pragma mark -
 #pragma mark - IBActions
 
 -(IBAction)onRefreshButtonClicked:(id)sender {
@@ -45,6 +70,10 @@
 
 #pragma mark -
 #pragma mark - Public Methods
+
+-(void)loadUrl:(NSURL *)url {
+    [self.webView loadRequest:[NSURLRequest requestWithURL:url]];
+}
 
 -(void)refresh {
     [self.webView stopLoading];
@@ -69,9 +98,81 @@
     }
 }
 
-
 #pragma mark -
 #pragma mark - private methods
+
+-(BOOL)isStreamingPlatform {
+
+    NSLog(@"checK isStreamingPlatform");
+    NSString *type = [self.webView stringByEvaluatingJavaScriptFromString:@" \
+     function getVideoContent() {\
+        var metas = document.getElementsByTagName('meta');  \
+        for (i=0; i<metas.length; i++) {    \
+            if (metas[i].getAttribute('property') == 'og:type') { \
+                return metas[i].getAttribute('content');    \
+                }   \
+            }   \
+        return "";  \
+     }; getVideoContent();"];
+    
+    if ([type isEqualToString:@"streaming platform"]) {
+        return YES;
+    }
+    
+    return NO;
+}
+
+-(void)getMenuList:(NSData *)data {
+    
+    TFHpple *xpath = [[TFHpple alloc] initWithData:data
+                                             isXML:NO];
+    NSArray *leftMenuElements = [NSArray array];
+    NSArray *rightMenuElements = [NSArray array];
+    
+    //    mobile-menu
+    leftMenuElements = [xpath searchWithXPathQuery:@"//html//body//section[@class='mobile-menu-user visible-xs is-load-visible']//li"]; // <-- left
+    rightMenuElements = [xpath searchWithXPathQuery:@"//html//body//section[@class='mobile-menu visible-xs is-load-visible']//li"]; // <-- right
+
+    
+    NSMutableArray *leftMenus = [NSMutableArray array];
+    NSMutableArray *rightMenus = [NSMutableArray array];
+    
+    for (TFHppleElement *element in leftMenuElements) {
+        BaseMenuObject *menu = [[BaseMenuObject alloc] init];
+        menu.name = element.content;
+        TFHppleElement *a = element.firstChild;
+        menu.url = a.attributes[@"href"];
+        [leftMenus addObject:menu];
+    }
+    
+    if ([rightMenuElements count] > 0) {
+        
+    } else {
+        rightMenuElements = [xpath searchWithXPathQuery:@"//html//body//section[@class='mobile-menu visible-xs']//li"]; // <-- right
+    }
+    
+    for (TFHppleElement *element in rightMenuElements) {
+        BaseMenuObject *menu = [[BaseMenuObject alloc] init];
+        menu.name = element.content;
+        TFHppleElement *a = element.firstChild;
+        menu.url = a.attributes[@"href"];
+        [rightMenus addObject:menu];
+    }
+    
+    [[APP_DELEGATE rootViewController] setLeftMenuList:leftMenus];
+    [[APP_DELEGATE rootViewController] setRightMenuList:rightMenus];
+}
+
+-(void)removeHeaderElement {
+    // remove header
+
+    if (self.webView) {
+        [self.webView stringByEvaluatingJavaScriptFromString:@"function f() { var element = document.getElementById('topSidebar'); element.parentNode.removeChild(element); } f();"];
+        
+        [self.webView stringByEvaluatingJavaScriptFromString:@"function f() { var element = document.getElementById('mobSidebar'); element.parentNode.removeChild(element); } f();"];
+
+    }
+}
 
 -(void)updateButtonStatus {
     
@@ -91,11 +192,11 @@
     NSLog(@"elementIdOrClass : %@, result : %@", elementIdOrClass, result);
     
     return ![result isEqualToString:@""];
-
+    
 }
 
 -(CGRect)getElementPosition:(NSString *)elementIdOrClass {
-
+    
     NSString *js = @"function f(){ var r = document.getElementById('%@').getBoundingClientRect(); return '{{'+r.left+','+r.top+'},{'+r.width+','+r.height+'}}'; } f();";
     NSString *result = [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:js, elementIdOrClass]];
     if ([result isEqual:@""]) {
@@ -108,11 +209,30 @@
     return CGRectFromString(result);
 }
 
+-(void)replaceImageSrc:(NSString *)element onClickTarget:(NSString *)rtmpUrl {
+    
+    NSString *js = [NSString stringWithFormat:@"function f() {var img = document.getElementsByClassName('%@')[0]; img.src='http://lctvapp.com/wp-content/uploads/2015/09/noflash.jpg'; img.onclick = function() {document.location='lctvapp://openplayer?rtmp=%@'}} f();", element, [rtmpUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
+    [self.webView stringByEvaluatingJavaScriptFromString:js];
+
+}
 
 #pragma mark -
 #pragma mark - UIWebView Delegate
 
 -(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    
+    NSString *urlString = request.URL.absoluteString;
+    
+    if ([urlString hasPrefix:@"lctvapp://openplayer"]) {
+        
+        NSString *rtmp = [urlString substringFromIndex:[@"lctvapp://openplayer?rtmp=" length]];
+        NSLog(@"param : %@", rtmp);
+        [PlayerViewController presentFromViewController:self withTitle:@"title" URL:[NSURL URLWithString:rtmp] completion:^{
+        }];
+        return NO;
+    }
+    
+    [[APP_DELEGATE rootViewController] headerHidden:[Configs checkIfNeedRemoveHeader:request]];
     
     return YES;
 }
@@ -120,23 +240,36 @@
 #define PLAYERHIDDENVIEWTAG 10000
 
 -(void)webViewDidStartLoad:(UIWebView *)webView {
-//    [self.playViewController.player pause];
-//    [self.playViewController.player stop];
-//    self.playViewController = nil;
+    //    [self.playViewController.player pause];
+    //    [self.playViewController.player stop];
+    //    self.playViewController = nil;
     
+    NSLog(@"start Load");
     for (UIView *subView in self.webView.scrollView.subviews) {
         if (subView.tag == PLAYERHIDDENVIEWTAG) {
             [subView removeFromSuperview];
         }
     }
-
+    
+    [self removeHeaderElement];
     [self updateButtonStatus];
+    NSLog(@"start finish");
 }
 
 -(void)webViewDidFinishLoad:(UIWebView *)webView {
-    [self updateButtonStatus];
     
+    NSLog(@"did finish ");
     NSString *html = [webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"];
+
+    NSLog(@"html : %@", html);
+    
+    [self updateButtonStatus];
+    [self removeHeaderElement];
+    
+    if ([Configs checkCanGetHeaderInfo:webView.request]
+        ||  [self isStreamingPlatform]) {
+        [self getMenuList:[html dataUsingEncoding:NSUTF8StringEncoding]];
+    }
     
     NSString *sourceString = [[NSString alloc] initWithData:[html dataUsingEncoding:NSUTF8StringEncoding] encoding:NSUTF8StringEncoding];
     
@@ -151,44 +284,55 @@
     } @catch (NSException * e) {
         exception = e;
     }
+    
+    //    NSLog(@"html : %@", html);
+    
+//    int i = 0;
+    
+    [self replaceImageSrc:@"video-home--image js-noflash show" onClickTarget:rtmp];
+    [self replaceImageSrc:@"noflash-img showIt" onClickTarget:rtmp];
 
-//    NSLog(@"html : %@", html);
     
-    int i = 0;
-    for (NSString *idOrClass in [Configs flashAlertIdAndClass]) {
-        i++;
-        NSLog(@"count : %d", i);
-        
-        if ([self hasElementPosition:idOrClass]) {
-            CGRect r = [self getElementPosition:idOrClass];
-            
-            UIView *subView = [[UIView alloc] init];
-            [subView setTag:PLAYERHIDDENVIEWTAG];
-            [subView setBackgroundColor:[UIColor whiteColor]];
-            [subView setFrame:r];
-            [self.webView.scrollView addSubview:subView];
-            
-            if (exception) {
-                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"error" message:@"no exist rtmp url" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil];
-                [alertView show];
-            }
-            
-            self.playViewController = [[PlayerViewController alloc] initWithURL:[NSURL URLWithString:rtmp]];
-            
-            [self addChildViewController:self.playViewController];
-            [self.playViewController.view setFrame:subView.bounds];
-            
-            [subView addSubview:self.playViewController.view];
-            
-        }
-    }
+//    a35d6384
+    //    for (NSString *idOrClass in [Configs flashAlertIdAndClass]) {
+//        i++;
+//        NSLog(@"count : %d", i);
+//        
+//        if ([self hasElementPosition:idOrClass]) {
+//            CGRect r = [self getElementPosition:idOrClass];
+//            
+//            if (exception) {
+//                UIAlertView *alertView = [[UIAlertView alloc] initWithTitle:@"error" message:@"no exist rtmp url" delegate:nil cancelButtonTitle:nil otherButtonTitles:@"Ok", nil];
+//                [alertView show];
+//            }
+//            
+//            if (self.playViewController) {
+//                NSLog(@"remove playerViewCon");
+//                [self.playViewController onClickPause:nil];
+//                if (self.playViewController.view.superview) {
+//                    [self.playViewController.view removeFromSuperview];
+//                }
+//
+//                self.playViewController = nil;
+//            }
+//            NSLog(@"alloc playerView ");
+//            self.playViewController = [[PlayerViewController alloc] initWithURL:[NSURL URLWithString:rtmp]];
+//            
+//            [self addChildViewController:self.playViewController];
+//            [self.playViewController.view setFrame:r];
+//            [self.playViewController.view setTag:PLAYERHIDDENVIEWTAG];
+//            [self.webView.scrollView setContentOffset:CGPointZero animated:NO];
+//            [self.webView.scrollView addSubview:self.playViewController.view];
+//            
+//        }
+//    }
     
-//    NSLog(@"html : %@", html);
-//    UIView *view = [[UIView alloc] init];
-//    [view setBackgroundColor:[UIColor whiteColor]];
-//    [view setFrame:[self getElementPosition:@"id_jwplayer"]];
-//    
-//    [self.webView addSubview:view];
+    //    NSLog(@"html : %@", html);
+    //    UIView *view = [[UIView alloc] init];
+    //    [view setBackgroundColor:[UIColor whiteColor]];
+    //    [view setFrame:[self getElementPosition:@"id_jwplayer"]];
+    //
+    //    [self.webView addSubview:view];
     
 }
 

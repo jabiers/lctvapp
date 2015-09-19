@@ -7,12 +7,11 @@
 //
 
 #import <Foundation/Foundation.h>
-#define HOST_URL_STRING @"https://livecoding.tv"
-#define HOST_URL [NSURL URLWithString:HOST_URL_STRING]
-#define HOME_URL_REQUEST [CommonUtils requestFromString:HOST_URL_STRING]
 
 @interface Configs : NSObject
 
++(BOOL)checkIfNeedRemoveHeader:(NSURLRequest *)request;
++(BOOL)checkCanGetHeaderInfo:(NSURLRequest *)request;
 +(NSArray *)flashAlertIdAndClass;
 
 @end
