@@ -12,6 +12,9 @@
 
 #import "TFHpple.h"
 
+#import "NSString+URLEncode.h"
+
+
 @implementation BaseWebViewController
 
 -(void)awakeFromNib {
@@ -40,6 +43,11 @@
     [super viewDidLoad];
     
     [self.webView loadRequest:HOME_URL_REQUEST];
+    
+    __weak BaseWebViewController *weak = self;
+    [self setRefreshWithScrollView:self.webView.scrollView withAction:^{
+        [weak refresh];
+    }];
     // Do any additional setup after loading the view.
 }
 
@@ -120,6 +128,22 @@
     }
     
     return NO;
+}
+
+-(NSString *)getChatUrl {
+    NSString *url = [self.webView stringByEvaluatingJavaScriptFromString:@" \
+                      function getVideoContent() {\
+                      var metas = document.getElementsByTagName('meta');  \
+                      for (i=0; i<metas.length; i++) {    \
+                      if (metas[i].getAttribute('property') == 'og:url') { \
+                      return metas[i].getAttribute('content');    \
+                      }   \
+                      }   \
+                      return "";  \
+                      }; getVideoContent();"];
+    
+    
+    return [NSString stringWithFormat:@"%@/chat%@",HOST_URL_STRING, url];
 }
 
 -(void)getMenuList:(NSData *)data {
@@ -209,10 +233,15 @@
     return CGRectFromString(result);
 }
 
--(void)replaceImageSrc:(NSString *)element onClickTarget:(NSString *)rtmpUrl {
+-(void)replaceImageSrc:(NSString *)element title:(NSString *)title chat:(NSString *)chat onClickTarget:(NSString *)rtmpUrl {
     
-    NSString *js = [NSString stringWithFormat:@"function f() {var img = document.getElementsByClassName('%@')[0]; img.src='http://lctvapp.com/wp-content/uploads/2015/09/noflash.jpg'; img.onclick = function() {document.location='lctvapp://openplayer?rtmp=%@'}} f();", element, [rtmpUrl stringByAddingPercentEscapesUsingEncoding:NSUTF8StringEncoding]];
-    [self.webView stringByEvaluatingJavaScriptFromString:js];
+    //link 세팅
+    [self.webView stringByEvaluatingJavaScriptFromString:[NSString stringWithFormat:@"function f() { document.getElementsByClassName('%@')[0].onclick = function() {document.location='lctvapp://openplayer?title=%@&chat=%@&rtmp=%@';}}; f(); ", element, [title URLDecode], [chat URLDecode], [rtmpUrl URLEncode]]];
+    
+    //이미지 바꾸기
+    NSString *js = [NSString stringWithFormat:@"function f() { document.getElementsByClassName('%@')[0].src = 'https://github.com/jabiers/lctvapp/blob/master/noflash.jpg?raw=true'}; f();", element];
+    
+    NSLog(@"replace result : %@", [self.webView stringByEvaluatingJavaScriptFromString:js]);
 
 }
 
@@ -223,11 +252,31 @@
     
     NSString *urlString = request.URL.absoluteString;
     
-    if ([urlString hasPrefix:@"lctvapp://openplayer"]) {
+    if ([urlString hasPrefix:@"lctvapp://openplayer?"]) {
         
-        NSString *rtmp = [urlString substringFromIndex:[@"lctvapp://openplayer?rtmp=" length]];
-        NSLog(@"param : %@", rtmp);
-        [PlayerViewController presentFromViewController:self withTitle:@"title" URL:[NSURL URLWithString:rtmp] completion:^{
+        NSString *allParams = [urlString componentsSeparatedByString:@"?"][1];
+        NSArray *params = [allParams componentsSeparatedByString:@"&"];
+        
+        
+        NSString *title = @"";
+        NSString *chat = @"";
+        NSString *rtmp = @"";
+        
+        for (NSString *param in params) {
+            NSString *key = [param componentsSeparatedByString:@"="][0];
+            NSString *value = [param componentsSeparatedByString:@"="][1];
+            
+            
+            if ([key isEqualToString:@"title"]) {
+                title = [value URLDecode];
+            } else if ([key isEqualToString:@"chat"]) {
+                chat = [value URLDecode];
+            } else if ([key isEqualToString:@"rtmp"]) {
+                rtmp = [value URLDecode];
+            }
+        }
+
+        [PlayerViewController presentFromViewController:self withTitle:title URL:[NSURL URLWithString:rtmp] withChatUrl:chat completion:^{
         }];
         return NO;
     }
@@ -258,7 +307,7 @@
 
 -(void)webViewDidFinishLoad:(UIWebView *)webView {
     
-    NSLog(@"did finish ");
+    [self endRefreshControl];
     NSString *html = [webView stringByEvaluatingJavaScriptFromString:@"document.documentElement.outerHTML"];
 
     NSLog(@"html : %@", html);
@@ -289,8 +338,12 @@
     
 //    int i = 0;
     
-    [self replaceImageSrc:@"video-home--image js-noflash show" onClickTarget:rtmp];
-    [self replaceImageSrc:@"noflash-img showIt" onClickTarget:rtmp];
+    
+    
+    NSString *streamTitle = [webView stringByEvaluatingJavaScriptFromString:@"document.getElementsByTagName('title')[0].text"];
+    
+    [self replaceImageSrc:@"video-home--image js-noflash" title:streamTitle chat:[self getChatUrl] onClickTarget:rtmp];
+    [self replaceImageSrc:@"noflash-img showIt" title:streamTitle chat:[self getChatUrl] onClickTarget:rtmp];
 
     
 //    a35d6384

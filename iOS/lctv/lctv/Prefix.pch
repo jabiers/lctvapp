@@ -21,6 +21,8 @@
 #import "AFNetworking.h"
 #import "UIKit+AFNetworking.h"
 #import "AppDefines.h"
+#import "Categories.h"
+#import "ESViewController.h"
 
 #ifndef TARGET_OS_IOS
 #define TARGET_OS_IOS TARGET_OS_IPHONE
