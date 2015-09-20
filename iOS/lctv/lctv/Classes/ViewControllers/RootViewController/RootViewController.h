@@ -6,7 +6,6 @@
 //  Copyright (c) 2015년 Kim DaeHyun. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "LeftMenuViewController.h"
 #import "RightMenuViewController.h"
 #import "BaseWebViewController.h"
@@ -15,7 +14,7 @@
 
 @end
 
-@interface RootViewController : UIViewController <LeftMenuViewProtocol, RightMenuViewProtocol>
+@interface RootViewController : ESViewController <LeftMenuViewProtocol, RightMenuViewProtocol>
 
 @property (weak, nonatomic) IBOutlet UIButton *leftMenuButton;
 @property (weak, nonatomic) IBOutlet UIButton *homeButton;

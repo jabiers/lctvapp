@@ -6,12 +6,11 @@
 //  Copyright (c) 2015년 Kim DaeHyun. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "BaseMenuObject.h"
 
 @protocol RightMenuViewProtocol;
 
-@interface RightMenuViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
+@interface RightMenuViewController : ESViewController <UITableViewDataSource, UITableViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UITableView *tableView;
 @property (strong, nonatomic) NSMutableArray *menuArray;

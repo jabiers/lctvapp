@@ -6,10 +6,9 @@
 //  Copyright (c) 2015년 Kim DaeHyun. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "PlayerViewController.h"
 
-@interface BaseWebViewController : UIViewController <UIWebViewDelegate>
+@interface BaseWebViewController : ESViewController <UIWebViewDelegate>
 
 @property (weak, nonatomic) IBOutlet UIWebView *webView;
 @property (weak, nonatomic) IBOutlet UIButton *forwardButton;

@@ -33,8 +33,11 @@
     return self;
 }
 
-+(void)presentFromViewController:(UIViewController *)viewController withTitle:(NSString *)title URL:(NSURL *)url completion:(void (^)())completion {
-    [viewController presentViewController:[[PlayerViewController alloc] initWithURL:url] animated:YES completion:completion];
++(void)presentFromViewController:(UIViewController *)viewController withTitle:(NSString *)title URL:(NSURL *)url withChatUrl:(NSString *)chatUrl completion:(void (^)())completion {
+    PlayerViewController *playVC = [[PlayerViewController alloc] initWithURL:url];
+    playVC.title = title;
+    playVC.chatUrl = chatUrl;
+    [viewController presentViewController:playVC animated:YES completion:completion];
 }
 
 #define EXPECTED_IJKPLAYER_VERSION (1 << 16) & 0xFF) |
@@ -45,6 +48,8 @@
     
     //    [[UIApplication sharedApplication] setStatusBarHidden:YES];
     //    [[UIApplication sharedApplication] setStatusBarOrientation:UIInterfaceOrientationLandscapeLeft animated:NO];
+    
+    [self.titleLabel setText:self.title];
     
 #ifdef DEBUG
     [IJKFFMoviePlayerController setLogReport:YES];
@@ -63,13 +68,18 @@
     self.player.scalingMode = MPMovieScalingModeAspectFit;
     
     self.view.autoresizesSubviews = YES;
-    [self.view addSubview:self.player.view];
+    [self.view insertSubview:self.player.view atIndex:0];
     
     UITapGestureRecognizer *tapGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(showOverayPanel)];
     [self.player.view addGestureRecognizer:tapGesture];
     
     [self.view bringSubviewToFront:self.overlayPanel];
-    
+    self.isShownChat = YES;
+    if (![self.chatUrl isEqualToString:@"https://livecoding.tv/chat"]) {
+        [self.webView loadRequest:[CommonUtils requestFromString:self.chatUrl]];
+    } else {
+        [self hideChatRoom];
+    }
 }
 
 - (void)viewWillAppear:(BOOL)animated {
@@ -111,6 +121,9 @@
     // Dispose of any resources that can be recreated.
 }
 
+#pragma mark -
+#pragma mark - Private Methods
+
 -(void)showOverayPanel {
     [self.overlayPanel setHidden:NO];
     
@@ -128,6 +141,35 @@
             [self.overlayPanel setHidden:YES];
     }];
 }
+
+-(void)chatButtonClick {
+    if (self.isShownChat) {
+        [self hideChatRoom];
+    } else {
+        [self showChatRoom];
+    }
+}
+
+-(void)showChatRoom {
+    self.webViewBottomConstraint.constant = 0;
+    [UIView animateWithDuration:0.5 animations:^{
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+        self.isShownChat =YES;
+    }];
+}
+
+-(void)hideChatRoom {
+
+    self.webViewBottomConstraint.constant = -self.webViewHeightConstraint.constant;
+    [UIView animateWithDuration:0.5f animations:^{
+        [self.view layoutIfNeeded];
+    } completion:^(BOOL finished) {
+        self.isShownChat = NO;
+    }];
+
+}
+
 #pragma mark IBAction
 
 //- (IBAction)onClickMediaControl:(id)sender
@@ -135,6 +177,11 @@
 //    [self.mediaControl showAndFade];
 //}
 //
+
+-(IBAction)onChatButtonClicked:(id)sender {
+    [self chatButtonClick];
+}
+
 - (IBAction)onClickOverlay:(id)sender
 {
     [self performSelector:@selector(hideOverayPanel) withObject:nil];
@@ -272,6 +319,17 @@
             break;
         }
     }
+}
+
+#pragma mark -
+#pragma mark - UIWebView Delegate
+
+-(BOOL)webView:(UIWebView *)webView shouldStartLoadWithRequest:(NSURLRequest *)request navigationType:(UIWebViewNavigationType)navigationType {
+    if ([request.URL.absoluteString hasPrefix:@"https://www.livecoding.tv/accounts/login"]) {
+        [self hideChatRoom];
+        return NO;
+    }
+    return YES;
 }
 
 #pragma mark Install Movie Notifications

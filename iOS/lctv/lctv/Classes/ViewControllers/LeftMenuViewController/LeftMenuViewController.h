@@ -6,12 +6,11 @@
 //  Copyright (c) 2015년 Kim DaeHyun. All rights reserved.
 //
 
-#import <UIKit/UIKit.h>
 #import "BaseMenuObject.h"
 
 @protocol LeftMenuViewProtocol;
 
-@interface LeftMenuViewController : UIViewController
+@interface LeftMenuViewController : ESViewController
 <
 UITableViewDataSource,
 UITableViewDelegate
