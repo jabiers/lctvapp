@@ -325,7 +325,7 @@
     NSString *rtmp;
     NSException *exception;
     @try {
-        NSRange start = [sourceString rangeOfString: @"rtmp"];
+        NSRange start = [sourceString rangeOfString: @"rtmp://"];
         NSString *startString = [sourceString substringFromIndex:start.location];
         NSRange end = [startString rangeOfString: @"\","];
         rtmp = [startString substringToIndex:end.location];

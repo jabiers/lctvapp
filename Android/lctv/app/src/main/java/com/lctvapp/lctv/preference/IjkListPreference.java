@@ -22,7 +22,7 @@ import android.support.v7.preference.ListPreference;
 import android.text.TextUtils;
 import android.util.AttributeSet;
 
-import tv.danmaku.ijk.media.sample.R;
+import com.lctvapp.lctv.R;
 
 public class IjkListPreference extends ListPreference {
     private CharSequence[] mEntrySummaries;

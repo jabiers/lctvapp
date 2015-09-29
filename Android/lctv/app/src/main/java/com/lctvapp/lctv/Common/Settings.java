@@ -20,7 +20,8 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
-import tv.danmaku.ijk.media.sample.R;
+import com.lctvapp.lctv.R;
+
 
 public class Settings {
     private Context mAppContext;

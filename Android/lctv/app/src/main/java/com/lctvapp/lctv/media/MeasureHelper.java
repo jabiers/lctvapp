@@ -20,9 +20,10 @@ import android.content.Context;
 import android.support.annotation.NonNull;
 import android.view.View;
 
+import com.lctvapp.lctv.R;
+
 import java.lang.ref.WeakReference;
 
-import tv.danmaku.ijk.media.sample.R;
 
 public final class MeasureHelper {
     private WeakReference<View> mWeakView;

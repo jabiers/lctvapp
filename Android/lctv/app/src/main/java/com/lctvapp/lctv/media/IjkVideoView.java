@@ -36,6 +36,10 @@ import android.view.View;
 import android.widget.FrameLayout;
 import android.widget.MediaController;
 
+import com.lctvapp.lctv.Common.Settings;
+import com.lctvapp.lctv.R;
+import com.lctvapp.lctv.services.MediaPlayerService;
+
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,9 +50,6 @@ import tv.danmaku.ijk.media.player.AndroidMediaPlayer;
 import tv.danmaku.ijk.media.player.IMediaPlayer;
 import tv.danmaku.ijk.media.player.IjkMediaPlayer;
 import tv.danmaku.ijk.media.player.TextureMediaPlayer;
-import tv.danmaku.ijk.media.sample.R;
-import tv.danmaku.ijk.media.sample.application.Settings;
-import tv.danmaku.ijk.media.sample.services.MediaPlayerService;
 
 public class IjkVideoView extends FrameLayout implements MediaController.MediaPlayerControl {
     private String TAG = "IjkVideoView";
